@@ -1,4 +1,4 @@
-/* eslint no-param-reassign: 0 */
+/* eslint-disable */
 export function fastfloor(x) {
   return x << 0; // x > 0 ? x : x - 1;
 }

@@ -1,5 +1,6 @@
 import dat from 'dat-gui';
 import Canvas from './Canvas';
+import simplexNoise from './simplexNoise';
 import RawImage from '../../resources/images/Paul1.jpg';
 //import { Generator } from './SimplexNoise';
 const Can = new Canvas();
@@ -17,7 +18,7 @@ export default class Render {
     this.useUnderlyingColors = false;
     this.padding = 70;
     this.points = [];
-
+    this.time = 0;
     const canvasReturn = Can.createCanvas('canvas');
     this.canvas = canvasReturn.canvas;
     this.context = canvasReturn.context;
@@ -82,11 +83,11 @@ export default class Render {
     this.intensity = options.intensity || this.intensity;
     this.baseRadius = options.baseRadius || this.baseRadius;
     this.useUnderlyingColors = options.useUnderlyingColors;
-    console.log(this.useUnderlyingColors);
-    this.drawImageToBackground();
+    this.preparePoints();
   };
 
   resize = () => {
+    window.cancelAnimationFrame(this.animation);
     const bgCanvasReturn = Can.setViewport(this.bgCanvas);
     const canvasReturn = Can.setViewport(this.canvas);
     this.drawImageToBackground();
@@ -168,27 +169,42 @@ export default class Render {
     }
     // Shrink radius at the edges, so it seems like we fade out into nothing.
     if ( x < this.padding ) {
-      radius = Math.ceil( radius * ( x / this.padding ) );
-    } else if ( x > this.bgCanvas.width - this.padding ) {
-      radius = Math.ceil( radius * ( (this.bgCanvas.width - x) / this.padding ) );
+      radius = Math.ceil(radius * (x / this.padding));
+    } else if ( x > this.bgCanvas.width - this.padding) {
+      radius = Math.ceil(radius * ((this.bgCanvas.width - x) / this.padding));
     }
     if ( y < this.padding ) {
-      radius = Math.ceil( radius * ( y / this.padding ) );
+      radius = Math.ceil(radius * (y / this.padding ) );
     } else if ( y > this.bgCanvas.height - this.padding ) {
-      radius = Math.ceil( radius * ( (this.bgCanvas.height - y) / this.padding ) );
+      radius = Math.ceil(radius * ((this.bgCanvas.height - y) / this.padding));
     }
     return radius * this.intensity;
   };
 
   drawPoints = () => {
     let currentPoint;
-    this.context.fillStyle = this.rgbToHex(~~(this.foreground[0]), ~~(this.foreground[1]), ~~(this.foreground[2]));
+    this.context.fillStyle = this.rgbToHex(
+      ~~(this.foreground[0]),
+      ~~(this.foreground[1]),
+      ~~(this.foreground[2])
+    );
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    const compColor = this.rgbToHex(~~(this.color[0]), ~~(this.color[1]), ~~(this.color[2]));
+    const compColor = this.rgbToHex(
+      ~~(this.color[0]),
+      ~~(this.color[1]),
+      ~~(this.color[2])
+    );
 
     this.context.lineCap = 'round';
+    const d = ~~(this.canvas.width / this.spacing);
+    const mul = 0.05;
+
     for ( let i = 0; i < this.points.length; i++ ) {
       currentPoint = this.points[i];
+      const x = i % d;
+      const y = ~~((i - x) / d);
+      const n = simplexNoise(mul * x, mul * y, this.time) * 3.5;
+
       if ( this.useUnderlyingColors ) {
         this.context.fillStyle = currentPoint.color;
         this.context.strokeStyle = currentPoint.color;
@@ -197,7 +213,8 @@ export default class Render {
         this.context.strokeStyle = compColor;
       }
       this.context.beginPath();
-      this.context.arc(currentPoint.x, currentPoint.y, currentPoint.radius ,0 , 2 * Math.PI, true);
+      this.context.arc(currentPoint.x, currentPoint.y + n,
+        currentPoint.radius + Math.abs(1 + n) ,0 , 2 * Math.PI, true);
       // this.context.fillRect( currentPoint.x - currentPoint.radius, currentPoint.y -
       //   currentPoint.radius, currentPoint.radius * 2, currentPoint.radius * 2 );
       this.context.closePath();
@@ -207,7 +224,8 @@ export default class Render {
 
   renderLoop = () => {
     this.drawPoints();
-    // this.animation = window.requestAnimationFrame(this.renderLoop);
+    this.time += 0.01;
+    this.animation = window.requestAnimationFrame(this.renderLoop);
   };
 
   loadData = ( data ) => {
@@ -220,8 +238,9 @@ export default class Render {
 
   // Image is loaded... draw to bg canvas
   drawImageToBackground = () => {
-    this.bgContext.drawImage( this.bgImage, 0, 0, this.canvas.width, this.canvas.height );
+    this.bgContext.drawImage( this.bgImage, 0, 0, this.canvas.width,
+      this.canvas.height );
     this.preparePoints();
-    this.drawPoints();
+    this.renderLoop();
   };
 }

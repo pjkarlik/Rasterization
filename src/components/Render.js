@@ -207,7 +207,7 @@ export default class Render {
 
   renderLoop = () => {
     this.drawPoints();
-    // this.animation = window.requestAnimationFrame(this.renderLoop);
+    this.animation = window.requestAnimationFrame(this.renderLoop);
   };
 
   loadData = ( data ) => {
