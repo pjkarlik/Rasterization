@@ -1,0 +1,23 @@
+html {
+  height: 100%;
+}
+body {
+  background: #333;
+  font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+  font-size: 16px;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body > * {
+  box-sizing: border-box;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
