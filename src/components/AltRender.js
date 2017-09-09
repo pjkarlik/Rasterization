@@ -9,11 +9,11 @@ export default class Render {
   constructor(element, width, height) {
     this.element = element;
     // Settings
-    this.spacing = 10;
-    this.baseRadius = 8;
-    this.intensity = 1;
+    this.spacing = 6;
+    this.baseRadius = 5;
+    this.intensity = 0.65;
     this.color = [0, 0, 0];
-    this.foreground = [50, 50, 50];
+    this.foreground = [150, 150, 150];
     this.invert = false;
     this.useUnderlyingColors = false;
     this.waveform = false;
