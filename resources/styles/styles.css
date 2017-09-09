@@ -26,12 +26,23 @@ body > * {
   z-index: 9999;
   opacity: 0.5;
   transition: top 200ms ease-in, opacity 200ms ease-in;
+
 }
 .inputbox:hover {
   top: 0;
   opacity: 1;
 }
 
+@media screen and (max-width : 768px) {
+  .inputbox {
+    top: 0;
+    opacity: 1;
+  }
+  .inputbox:hover {
+    top: 0;
+    opacity: 1;
+  }
+}
 .inputbox input {
   border-right: 1px solid #FFF;
   background: rgba(255,255,255,0.1);

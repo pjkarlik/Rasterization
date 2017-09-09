@@ -6,6 +6,7 @@ const path = require('path');
 const pkgInfo = require('./package.json');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { name, version, description } = pkgInfo;
 
 fs.writeFileSync('version.json', JSON.stringify({ name, version, description }));
@@ -133,6 +134,12 @@ const config = {
       filename: `style/[name].${marker}.[contenthash].css`,
       allChunks: true
     }),
+    new CopyWebpackPlugin([
+      {
+        from: './resources/images/rasterizer.png',
+        to: './rasterizer.png'
+      }
+    ]),
     new HtmlWebpackPlugin({
       css: 'styles/styles.css',
       title: 'Rasterize',
