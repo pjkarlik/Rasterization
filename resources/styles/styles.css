@@ -16,6 +16,36 @@ body > * {
   box-sizing: border-box;
 }
 
+.inputbox {
+  background: #000;
+  position: absolute;
+  top: -50px;
+  left: 0;
+  padding: 1em;
+  color: #FFF;
+  z-index: 9999;
+  opacity: 0.5;
+  transition: top 200ms ease-in, opacity 200ms ease-in;
+}
+.inputbox:hover {
+  top: 0;
+  opacity: 1;
+}
+
+.inputbox input {
+  border-right: 1px solid #FFF;
+  background: rgba(255,255,255,0.1);
+  margin: 1em;
+  clear: both;
+}
+
+.inputbox span {
+  display: block;
+  text-align: left;
+  font-size: .75em;
+  padding: .313em 1em 0;
+}
+
 .wrapper {
   width: 100%;
   height: 100%;

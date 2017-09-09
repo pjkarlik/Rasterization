@@ -1,7 +1,7 @@
 import dat from 'dat-gui';
 import Canvas from './Canvas';
 import simplexNoise from './simplexNoise';
-import RawImage from '../../resources/images/Paul1.jpg';
+import RawImage from '../../resources/images/charles.jpg';
 //import { Generator } from './SimplexNoise';
 const Can = new Canvas();
 /** Parent Render Class */
@@ -16,6 +16,7 @@ export default class Render {
     this.foreground = [50, 50, 50];
     this.invert = false;
     this.useUnderlyingColors = false;
+    this.waveform = false;
     this.padding = 70;
     this.points = [];
     this.time = 0;
@@ -26,10 +27,32 @@ export default class Render {
     this.bgCanvas = bgCanvasReturn.canvas;
     this.bgContext = bgCanvasReturn.context;
 
+    const formBox = document.createElement('div');
+    formBox.className = 'inputbox';
+    formBox.addEventListener('change', this.uploadImage);
+    const upload = document.createElement('input');
+    upload.className = 'upload';
+    upload.type = 'file';
+    const infotext = document.createElement('span');
+    infotext.innerHTML = '▲ upload image';
+    formBox.appendChild(upload);
+    formBox.appendChild(infotext);
+    document.body.appendChild(formBox);
+
     window.addEventListener('resize', this.resize);
     this.createGUI();
     this.loadData(RawImage);
   }
+
+  uploadImage = (e) => {
+    const fileReader = new FileReader();
+    console.log(e);
+    fileReader.onload = (event) => {
+      console.log(event.target);
+      this.loadData(event.target.result);
+    };
+    fileReader.readAsDataURL(e.target.files[0]);
+  };
 
   createGUI = () => {
     this.options = {
@@ -38,6 +61,7 @@ export default class Render {
       baseRadius: this.baseRadius,
       color: this.color,
       foreground: this.foreground,
+      waveform: this.waveform,
       useUnderlyingColors: this.useUnderlyingColors
     };
     this.gui = new dat.GUI();
@@ -63,6 +87,11 @@ export default class Render {
         this.options.useUnderlyingColors = value;
         this.setOptions(this.options);
       });
+    folderRender.add(this.options, 'waveform')
+      .onChange((value) => {
+        this.options.waveform = value;
+        this.setOptions(this.options);
+      });
     folderRender.addColor(this.options, 'color')
       .onChange((value) => {
         this.options.color = value;
@@ -73,7 +102,7 @@ export default class Render {
         this.options.foreground = value;
         this.setOptions(this.options);
       });
-    folderRender.open();
+    // folderRender.open();
   };
 
   setOptions = (options) => {
@@ -83,6 +112,7 @@ export default class Render {
     this.intensity = options.intensity || this.intensity;
     this.baseRadius = options.baseRadius || this.baseRadius;
     this.useUnderlyingColors = options.useUnderlyingColors;
+    this.waveform = options.waveform;
     this.preparePoints();
   };
 
@@ -198,12 +228,17 @@ export default class Render {
     this.context.lineCap = 'round';
     const d = ~~(this.canvas.width / this.spacing);
     const mul = 0.05;
-
+    let n;
     for ( let i = 0; i < this.points.length; i++ ) {
       currentPoint = this.points[i];
-      const x = i % d;
-      const y = ~~((i - x) / d);
-      const n = simplexNoise(mul * x, mul * y, this.time) * 3.5;
+      if (this.waveform) {
+        const x = i % d;
+        const y = ~~((i - x) / d);
+        n = simplexNoise(mul * x, mul * y, this.time) * 3.5;
+      } else {
+        n = 0;
+      }
+
 
       if ( this.useUnderlyingColors ) {
         this.context.fillStyle = currentPoint.color;
