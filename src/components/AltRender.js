@@ -10,10 +10,10 @@ export default class Render {
     this.element = element;
     // Settings
     this.spacing = 6;
-    this.baseRadius = 5;
-    this.intensity = 0.65;
-    this.color = [0, 0, 0];
-    this.foreground = [150, 150, 150];
+    this.baseRadius = 15;
+    this.intensity = 0.2;
+    this.color = [115, 0, 75];
+    this.foreground = [200, 200, 200];
     this.invert = false;
     this.useUnderlyingColors = false;
     this.waveform = false;
@@ -46,9 +46,7 @@ export default class Render {
 
   uploadImage = (e) => {
     const fileReader = new FileReader();
-    console.log(e);
     fileReader.onload = (event) => {
-      console.log(event.target);
       this.loadData(event.target.result);
     };
     fileReader.readAsDataURL(e.target.files[0]);
@@ -67,12 +65,12 @@ export default class Render {
     this.gui = new dat.GUI();
 
     const folderRender = this.gui.addFolder('Render Options');
-    folderRender.add(this.options, 'spacing', 6, 100).step(2)
+    folderRender.add(this.options, 'spacing', 4, 32).step(2)
       .onFinishChange((value) => {
         this.options.spacing = value;
         this.setOptions(this.options);
       });
-    folderRender.add(this.options, 'baseRadius', 1, 50).step(1)
+    folderRender.add(this.options, 'baseRadius', 1, 25).step(1)
       .onFinishChange((value) => {
         this.options.baseRadius = value;
         this.setOptions(this.options);
@@ -227,14 +225,14 @@ export default class Render {
 
     this.context.lineCap = 'round';
     const d = ~~(this.canvas.width / this.spacing);
-    const mul = 0.05;
+    const mul = 0.015;
     let n;
     for ( let i = 0; i < this.points.length; i++ ) {
       currentPoint = this.points[i];
       if (this.waveform) {
         const x = i % d;
         const y = ~~((i - x) / d);
-        n = simplexNoise(mul * x, mul * y, this.time) * 3.5;
+        n = simplexNoise(mul * x, mul * y, this.time) * 5.5;
       } else {
         n = 0;
       }
@@ -248,10 +246,13 @@ export default class Render {
         this.context.strokeStyle = compColor;
       }
       this.context.beginPath();
-      this.context.arc(currentPoint.x, currentPoint.y + n,
-        currentPoint.radius + Math.abs(1 + n) ,0 , 2 * Math.PI, true);
-      // this.context.fillRect( currentPoint.x - currentPoint.radius, currentPoint.y -
-      //   currentPoint.radius, currentPoint.radius * 2, currentPoint.radius * 2 );
+      // this.context.arc(currentPoint.x, currentPoint.y + n,
+      //   currentPoint.radius + Math.abs(1 + n) ,0 , 2 * Math.PI, true);
+      this.context.fillRect(
+        currentPoint.x - currentPoint.radius + Math.abs(1 + n),
+        currentPoint.y - currentPoint.radius + Math.abs(1 + n),
+        currentPoint.radius * 2 + Math.abs(1 + n),
+        currentPoint.radius * 2 + Math.abs(1 + n));
       this.context.closePath();
       this.context.fill();
     }
@@ -259,7 +260,7 @@ export default class Render {
 
   renderLoop = () => {
     this.drawPoints();
-    this.time += 0.01;
+    this.time += 0.03;
     this.animation = window.requestAnimationFrame(this.renderLoop);
   };
 
