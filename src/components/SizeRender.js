@@ -17,7 +17,7 @@ export default class Render {
     this.invert = false;
     this.useUnderlyingColors = false;
     this.waveform = false;
-    this.padding = 70;
+    this.padding = 120;
     this.points = [];
     this.time = 0;
     this.bgImageHeight = 0;
