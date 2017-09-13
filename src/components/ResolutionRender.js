@@ -71,7 +71,6 @@ export default class Render {
         }
       );
     }
-    // setTimeout(() => { this.drawImageToBackground(this.video); }, 1500);
   }
 
   snapShot = () => {
@@ -134,10 +133,11 @@ export default class Render {
     window.cancelAnimationFrame(this.animation);
     const bgCanvasReturn = Can.setViewport(this.bgCanvas);
     const canvasReturn = Can.setViewport(this.canvas);
-    this.drawImageToBackground();
+    this.renderLoop();
   };
 
   resizeCanvas = ( width, height ) => {
+    window.cancelAnimationFrame(this.animation);
     let newWidth;
     let newHeight;
 
@@ -157,6 +157,11 @@ export default class Render {
     this.canvas.height = newHeight;
     this.canvas.style.marginLeft = -this.canvas.width/2 + 'px';
     this.canvas.style.marginTop = -this.canvas.height/2 + 'px';
+    this.bgCanvas.width = newWidth;
+    this.bgCanvas.height = newHeight;
+    this.bgCanvas.style.marginLeft = -this.bgCanvas.width/2 + 'px';
+    this.bgCanvas.style.marginTop = -this.bgCanvas.height/2 + 'px';
+    this.renderLoop();
   };
 
   rgbToHex = (r, g, b) => {
