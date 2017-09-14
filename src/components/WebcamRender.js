@@ -77,7 +77,9 @@ export default class Render {
   }
 
   snapShot = () => {
+    // this.video.play();
     this.drawImageToBackground(this.video);
+    // this.video.pause();
   };
 
   uploadImage = (e) => {

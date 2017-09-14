@@ -10,19 +10,14 @@ export default class Render {
     this.element = element;
     // Settings
 
-    this.spacing = 10;
-    this.baseRadius = 10;
+    this.spacing = 24;
     this.invert = false;
-
+    this.useUnderlyingColors = true;
     this.intensity = 1;
-    this.waveform = false;
-    this.padding = 120;
-
     this.points = [];
     this.time = 0;
     this.bgImageHeight = 0;
     this.bgImageWidth = 0;
-    this.useUnderlyingColors = true;
 
     const canvasReturn = Can.createCanvas('canvas');
     this.canvas = canvasReturn.canvas;
@@ -46,6 +41,9 @@ export default class Render {
     this.video;
     this.startWebcam();
     this.createGUI();
+    setTimeout(()=>{
+      //this.snapShot();
+    }, 1000);
     this.loadData(RawImage);
 
     window.addEventListener('resize', this.resize);
@@ -54,8 +52,8 @@ export default class Render {
   startWebcam = () => {
     const videoBlock = document.createElement('video');
     videoBlock.className = 'video';
-    videoBlock.width = 640;
-    videoBlock.height = 480;
+    videoBlock.width = 160;
+    videoBlock.height = 120;
     videoBlock.id = 'video';
     videoBlock.setAttribute('autoplay',true);
     document.body.appendChild(videoBlock);
@@ -99,7 +97,7 @@ export default class Render {
     const obj = { screenShot:() => { this.snapShot(); }};
 
     const folderRender = this.gui.addFolder('Render Options');
-    folderRender.add(this.options, 'spacing', 4, 32).step(2)
+    folderRender.add(this.options, 'spacing', 4, 100).step(2)
       .onFinishChange((value) => {
         this.options.spacing = value;
         this.setOptions(this.options);
@@ -109,11 +107,11 @@ export default class Render {
     //     this.options.intensity = value;
     //     this.setOptions(this.options);
     //   });
-    // folderRender.add(this.options, 'invert')
-    //   .onChange((value) => {
-    //     this.options.invert = value;
-    //     this.setOptions(this.options);
-    //   });
+    folderRender.add(this.options, 'invert')
+      .onChange((value) => {
+        this.options.invert = value;
+        this.setOptions(this.options);
+      });
     folderRender.add(this.options, 'useUnderlyingColors')
       .onChange((value) => {
         this.options.useUnderlyingColors = value;
@@ -130,14 +128,12 @@ export default class Render {
     this.useUnderlyingColors = options.useUnderlyingColors;
     this.invert = options.invert;
     this.preparePoints();
-    this.drawPoints();
   };
 
   resize = () => {
     window.cancelAnimationFrame(this.animation);
     const bgCanvasReturn = Can.setViewport(this.bgCanvas);
     const canvasReturn = Can.setViewport(this.canvas);
-    this.renderLoop();
   };
 
   resizeCanvas = ( width, height ) => {
@@ -165,7 +161,6 @@ export default class Render {
     this.bgCanvas.height = newHeight;
     this.bgCanvas.style.marginLeft = -this.bgCanvas.width/2 + 'px';
     this.bgCanvas.style.marginTop = -this.bgCanvas.height/2 + 'px';
-    this.renderLoop();
   };
 
   rgbToHex = (r, g, b) => {
@@ -228,27 +223,6 @@ export default class Render {
     }
   };
 
-  calculateRadius = ( x, y, color) => {
-    let radius;
-    if ( this.invert ) {
-      radius = Math.round( this.baseRadius * ( color / 255 ) );
-    } else {
-      radius = Math.round( this.baseRadius * (1 - ( color / 255 ) ) );
-    }
-    // Shrink radius at the edges, so it seems like we fade out into nothing.
-    if ( x < this.padding ) {
-      radius = Math.ceil(radius * (x / this.padding));
-    } else if ( x > this.bgCanvas.width - this.padding) {
-      radius = Math.ceil(radius * ((this.bgCanvas.width - x) / this.padding));
-    }
-    if ( y < this.padding ) {
-      radius = Math.ceil(radius * (y / this.padding ) );
-    } else if ( y > this.bgCanvas.height - this.padding ) {
-      radius = Math.ceil(radius * ((this.bgCanvas.height - y) / this.padding));
-    }
-    return radius * this.intensity;
-  };
-
   drawPoints = () => {
     let currentPoint;
     this.context.fillStyle = '#000000';
@@ -277,7 +251,10 @@ export default class Render {
 
   renderLoop = () => {
     this.drawPoints();
-    this.time += 0.03;
+    // this.time++;
+    // if(this.time % 60 === 0) {
+    //   this.snapShot();
+    // }
     // this.animation = window.requestAnimationFrame(this.renderLoop);
   };
 
