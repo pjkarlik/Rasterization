@@ -1,5 +1,5 @@
-![travis ci build](https://travis-ci.org/pjkarlik/Rasterize.svg?branch=master)
-![webpack2](https://img.shields.io/badge/webpack-2.0-brightgreen.svg) ![version](https://img.shields.io/badge/version-0.0.1-yellow.svg) 
+![travis ci build](https://travis-ci.org/pjkarlik/Rasterization.svg?branch=master)
+![webpack2](https://img.shields.io/badge/webpack-2.0-brightgreen.svg) ![version](https://img.shields.io/badge/version-0.0.1-yellow.svg)
 
 # Rasterization
 
