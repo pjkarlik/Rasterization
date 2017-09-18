@@ -12,7 +12,7 @@ export default class Render {
     this.spacing = 6;
     this.baseRadius = 15;
     this.intensity = 0.2;
-    this.color = [115, 0, 75];
+    this.color = [75, 0, 115];
     this.foreground = [200, 200, 200];
     this.invert = false;
     this.useUnderlyingColors = false;
