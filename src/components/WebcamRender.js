@@ -9,17 +9,17 @@ export default class Render {
   constructor(element, width, height) {
     this.element = element;
     // Settings
-    this.spacing = 6;
-    this.baseRadius = 15;
+    this.spacing = 14;
+    this.baseRadius = 25;
     this.intensity = 0.2;
-    this.color = [115, 0, 75];
-    this.foreground = [200, 200, 200];
+    this.color = [115, 100, 175];
+    this.foreground = [0, 0, 0];
     this.invert = false;
-    this.useUnderlyingColors = false;
-    this.waveform = false;
+    this.useUnderlyingColors = true;
     this.padding = 0;
     this.points = [];
     this.time = 0;
+    this.frames = 0;
     this.bgImageHeight = 0;
     this.bgImageWidth = 0;
     const canvasReturn = Can.createCanvas('canvas');
@@ -28,19 +28,9 @@ export default class Render {
     const bgCanvasReturn = Can.createCanvas('bgcanvas');
     this.bgCanvas = bgCanvasReturn.canvas;
     this.bgContext = bgCanvasReturn.context;
-
-    const formBox = document.createElement('div');
-    formBox.className = 'inputbox';
-    formBox.addEventListener('change', this.uploadImage);
-    const upload = document.createElement('input');
-    upload.className = 'upload';
-    upload.type = 'file';
-    const infotext = document.createElement('span');
-    infotext.innerHTML = '▲ upload image';
-    formBox.appendChild(upload);
-    formBox.appendChild(infotext);
-    document.body.appendChild(formBox);
-
+    console.log(Math.floor(this.canvas.width / 60));
+    this.spacing = Math.floor(this.canvas.width / 20);
+    this.baseRadius = this.spacing * 3;
     this.video;
 
     this.createGUI();
@@ -78,7 +68,8 @@ export default class Render {
 
   snapShot = () => {
     // this.video.play();
-    this.drawImageToBackground(this.video);
+    const imageSource = this.video;
+    this.drawImageToBackground(imageSource);
     // this.video.pause();
   };
 
@@ -97,61 +88,43 @@ export default class Render {
       baseRadius: this.baseRadius,
       color: this.color,
       foreground: this.foreground,
-      waveform: this.waveform,
       useUnderlyingColors: this.useUnderlyingColors
     };
     this.gui = new dat.GUI();
     const obj = { screenShot:() => { this.snapShot(); }};
 
     const folderRender = this.gui.addFolder('Render Options');
-    folderRender.add(this.options, 'spacing', 4, 32).step(2)
-      .onFinishChange((value) => {
-        this.options.spacing = value;
-        this.setOptions(this.options);
-      });
-    folderRender.add(this.options, 'baseRadius', 1, 25).step(1)
-      .onFinishChange((value) => {
-        this.options.baseRadius = value;
-        this.setOptions(this.options);
-      });
+    // folderRender.add(this.options, 'spacing', 8, 75).step(1)
+    //   .onFinishChange((value) => {
+    //     this.spacing = value;
+    //     this.preparePoints();
+    //   });
+    // folderRender.add(this.options, 'baseRadius', 1, 75).step(0.1)
+    //   .onFinishChange((value) => {
+    //     this.baseRadius = value;
+    //     this.preparePoints();
+    //   });
     folderRender.add(this.options, 'intensity', 0, 2).step(0.1)
       .onFinishChange((value) => {
-        this.options.intensity = value;
-        this.setOptions(this.options);
+        this.intensity = value;
+        this.preparePoints();
       });
     folderRender.add(obj,'screenShot');
     folderRender.add(this.options, 'useUnderlyingColors')
       .onChange((value) => {
-        this.options.useUnderlyingColors = value;
-        this.setOptions(this.options);
-      });
-    folderRender.add(this.options, 'waveform')
-      .onChange((value) => {
-        this.options.waveform = value;
-        this.setOptions(this.options);
+        this.useUnderlyingColors = value;
       });
     folderRender.addColor(this.options, 'color')
       .onChange((value) => {
-        this.options.color = value;
-        this.setOptions(this.options);
+        this.color = value;
+        this.preparePoints();
       });
     folderRender.addColor(this.options, 'foreground')
       .onChange((value) => {
-        this.options.foreground = value;
-        this.setOptions(this.options);
+        this.foreground = value;
+        this.preparePoints();
       });
     // folderRender.open();
-  };
-
-  setOptions = (options) => {
-    this.spacing = ~~(options.spacing) || this.spacing;
-    this.color = options.color || this.color;
-    this.foreground = options.foreground || this.foreground;
-    this.intensity = options.intensity || this.intensity;
-    this.baseRadius = options.baseRadius || this.baseRadius;
-    this.useUnderlyingColors = options.useUnderlyingColors;
-    this.waveform = options.waveform;
-    this.preparePoints();
   };
 
   resize = () => {
@@ -252,10 +225,16 @@ export default class Render {
 
   drawPoints = () => {
     let currentPoint;
-    this.context.fillStyle = this.rgbToHex(
+    this.context.fillStyle = this.useUnderlyingColors ?
+    this.rgbToHex(
       ~~(this.foreground[0]),
       ~~(this.foreground[1]),
       ~~(this.foreground[2])
+    ) :
+    this.rgbToHex(
+      ~~(255-this.foreground[0]),
+      ~~(255-this.foreground[1]),
+      ~~(255-this.foreground[2])
     );
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -294,8 +273,8 @@ export default class Render {
       // this.context.arc(currentPoint.x, currentPoint.y + n,
       //   currentPoint.radius + Math.abs(1 + n) ,0 , 2 * Math.PI, true);
       this.context.fillRect(
-        (x * this.spacing) - currentPoint.radius - Math.abs(1 + n),
-        (y * this.spacing) - currentPoint.radius - Math.abs(1 + n),
+        (this.spacing * 0.75 + (x * this.spacing)) - currentPoint.radius - Math.abs(1 + n),
+        (this.spacing * 0.75 + (y * this.spacing)) - currentPoint.radius - Math.abs(1 + n),
         currentPoint.radius * 2 + Math.abs(1 + n),
         currentPoint.radius * 2 + Math.abs(1 + n));
       this.context.closePath();
@@ -304,8 +283,12 @@ export default class Render {
   };
 
   renderLoop = () => {
-    this.drawPoints();
-    this.time += 0.03;
+    this.frames += 1;
+    if(this.frames % 128 === 0) {
+      this.snapShot();
+      this.drawPoints();
+    }
+    
     this.animation = window.requestAnimationFrame(this.renderLoop);
   };
 
@@ -321,6 +304,7 @@ export default class Render {
 
   // Image is loaded... draw to bg canvas
   drawImageToBackground = (image) => {
+    // console.log(image);
     this.bgContext.drawImage( image, 0, 0, this.canvas.width,
       this.canvas.height );
     this.preparePoints();
