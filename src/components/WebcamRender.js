@@ -22,20 +22,19 @@ export default class Render {
     this.video = null;
     this.element = element;
     // Settings //
-    this.baseRadius = 25;
-    this.intensity = 0.2;
-    this.color = '#000000';
-    this.foreground = '#666666';
+    this.intensity = 0.27;
+    this.color = '#48003f';
+    this.foreground = '#0083a0';
     this.invert = false;
     this.useUnderlyingColors = false;
     this.padding = 0;
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.sizing = 70;
+    this.sizing = 25;
     this.spacing = Math.floor(this.canvas.width / this.sizing);
-    this.baseRadius = this.spacing * 2;
-
+    // this.baseRadius = this.spacing * 2;
+    this.baseRadius = 65;
     this.createGUI();
     this.startWebcam('video', 640, 480);
     //this.loadData(RawImage);
@@ -94,14 +93,19 @@ export default class Render {
     const obj = { screenShot:() => { this.snapShot(); }};
 
     const folderRender = this.gui.addFolder('Render Options');
-    folderRender.add(this.options, 'sizing', 10, 90).step(1)
+    folderRender.add(this.options, 'sizing', 10, 125).step(1)
       .onFinishChange((value) => {
         this.sizing = value;
         this.spacing = Math.floor(this.canvas.width / this.sizing);
-        this.baseRadius = this.spacing * 2;
+        // this.baseRadius = this.spacing * 2;
         this.preparePoints();
       });
-    folderRender.add(this.options, 'intensity', 0, 2).step(0.1)
+    folderRender.add(this.options, 'baseRadius', 0, 35).step(0.1)
+      .onFinishChange((value) => {
+        this.baseRadius = value;
+        this.preparePoints();
+      });
+    folderRender.add(this.options, 'intensity', 0.01, 2.00).step(0.01)
       .onFinishChange((value) => {
         this.intensity = value;
         this.preparePoints();
