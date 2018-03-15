@@ -133,34 +133,15 @@ export default class Render {
   resize = () => {
     window.cancelAnimationFrame(this.animation);
     const bgCanvasReturn = Can.setViewport(this.bgCanvas);
+    this.bgCanvas.width = bgCanvasReturn.width;
+    this.bgCanvas.height = bgCanvasReturn.height;
     const canvasReturn = Can.setViewport(this.canvas);
-  };
+    this.canvas.width = canvasReturn.width;
+    this.canvas.height = canvasReturn.height;
+    this.spacing = Math.floor(this.canvas.width / 40);
+    this.baseRadius = this.spacing * 3;
 
-  resizeCanvas = ( width, height ) => {
-    window.cancelAnimationFrame(this.animation);
-    let newWidth;
-    let newHeight;
-
-    const availableWidth = window.innerWidth - this.size * 2;
-    const availableHeight = window.innerHeight - this.size * 2;
-
-    // If the image is too big for the screen... scale it down.
-    if ( width > availableWidth || height > availableHeight ) {
-      const maxRatio = Math.max( width / availableWidth , height / availableHeight );
-      newWidth = width / maxRatio;
-      newHeight = height / maxRatio;
-    } else {
-      newWidth = width;
-      newHeight = height;
-    }
-    this.canvas.width = newWidth;
-    this.canvas.height = newHeight;
-    this.canvas.style.marginLeft = -this.canvas.width/2 + 'px';
-    this.canvas.style.marginTop = -this.canvas.height/2 + 'px';
-    this.bgCanvas.width = newWidth;
-    this.bgCanvas.height = newHeight;
-    this.bgCanvas.style.marginLeft = -this.bgCanvas.width/2 + 'px';
-    this.bgCanvas.style.marginTop = -this.bgCanvas.height/2 + 'px';
+    this.renderLoop();
   };
 
   rgbToHex = (r, g, b) => {

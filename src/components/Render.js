@@ -87,9 +87,18 @@ export default class Render {
   };
 
   resize = () => {
+    window.cancelAnimationFrame(this.animation);
     const bgCanvasReturn = Can.setViewport(this.bgCanvas);
+    this.bgCanvas.width = bgCanvasReturn.width;
+    this.bgCanvas.height = bgCanvasReturn.height;
     const canvasReturn = Can.setViewport(this.canvas);
-    this.drawImageToBackground();
+    this.canvas.width = canvasReturn.width;
+    this.canvas.height = canvasReturn.height;
+  
+    this.spacing = Math.floor(this.canvas.width / 40);
+    this.baseRadius = this.spacing * 3;
+
+    this.renderLoop();
   };
 
   resizeCanvas = ( width, height ) => {
