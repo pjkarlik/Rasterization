@@ -124,7 +124,7 @@ export default class Render {
     const canvasReturn = Can.setViewport(this.canvas);
     this.canvas.width = canvasReturn.width;
     this.canvas.height = canvasReturn.height;
-    console.log(canvasReturn);
+
     this.spacing = Math.floor(this.canvas.width / 40);
     this.baseRadius = this.spacing * 3;
 
@@ -172,7 +172,6 @@ export default class Render {
         this.points.push( { x: j, y: i, radius: baseRadius, color: color } );
       }
     }
-
   };
 
   calculateRadius = ( x, y, color) => {
@@ -181,17 +180,6 @@ export default class Render {
       radius = Math.round( this.baseRadius * ( color / 255 ) );
     } else {
       radius = Math.round( this.baseRadius * (1 - ( color / 255 ) ) );
-    }
-    // Shrink radius at the edges, so it seems like we fade out into nothing.
-    if ( x < this.padding ) {
-      radius = Math.ceil(radius * (x / this.padding));
-    } else if ( x > this.bgCanvas.width - this.padding) {
-      radius = Math.ceil(radius * ((this.bgCanvas.width - x) / this.padding));
-    }
-    if ( y < this.padding ) {
-      radius = Math.ceil(radius * (y / this.padding ) );
-    } else if ( y > this.bgCanvas.height - this.padding ) {
-      radius = Math.ceil(radius * ((this.bgCanvas.height - y) / this.padding));
     }
     return radius * this.intensity;
   };
@@ -260,17 +248,18 @@ export default class Render {
     this.bgImage.src = data;
     this.bgImageHeight = this.bgImage.height;
     this.bgImageWidth = this.bgImage.width;
-    console.log(this.bgImageWidth);
     this.bgImage.onload = () => {
-      this.drawImageToBackground();
+      this.bgContext.drawImage(this.bgImage, 0, 0, this.bgCanvas.width,
+        this.bgCanvas.height);
+      this.preparePoints();
+      this.renderLoop();
     };
   };
 
   // Image is loaded... draw to bg canvas
-  drawImageToBackground = () => {
-    this.bgContext.drawImage( this.bgImage, 0, 0, this.canvas.width,
-      this.canvas.height );
+  drawImageToBackground = (image) => {
+    this.bgContext.drawImage( image, 0, 0, this.bgCanvas.width,
+      this.bgCanvas.height );
     this.preparePoints();
-    this.renderLoop();
   };
 }

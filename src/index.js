@@ -1,4 +1,4 @@
-import Render from './components/WebcamRender';
+import Render from './components/SizeRender';
 import { description, version } from '../version.json';
 
 require('../resources/styles/styles.css');
