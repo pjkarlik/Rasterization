@@ -25,18 +25,16 @@ export default class Render {
     this.intensity = 0.17;
     this.color = '#ff00d0';
     this.foreground = '#222222';
-    this.invert = true;
-    this.showPoints = true;
-    this.useUnderlyingColors = true;
+    this.invert = false;
+    this.useUnderlyingColors = false;
     this.padding = 0;
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.sizing = 80;
-    this.lineWidth = 1.0;
+    this.sizing = 120;
     this.spacing = Math.floor(this.canvas.width / this.sizing);
     // this.baseRadius = this.spacing * 5;
-    this.baseRadius = 15;
+    this.baseRadius = 40;
     this.createGUI();
     this.startWebcam('video', 640, 480);
     //this.loadData(RawImage);
@@ -86,12 +84,10 @@ export default class Render {
       spacing: this.spacing,
       sizing: this.sizing,
       intensity: this.intensity,
-      lineWidth: this.lineWidth,
       baseRadius: this.baseRadius,
       color: this.color,
       foreground: this.foreground,
       invert: this.invert,
-      showPoints: this.showPoints,
       useUnderlyingColors: this.useUnderlyingColors
     };
     this.gui = new dat.GUI();
@@ -104,10 +100,6 @@ export default class Render {
         this.spacing = Math.floor(this.canvas.width / this.sizing);
         this.preparePoints();
       });
-    folderRender.add(this.options, 'lineWidth', 0, 15).step(0.1)
-      .onFinishChange((value) => {
-        this.lineWidth = value;
-      });
     folderRender.add(this.options, 'baseRadius', 0, 135).step(0.1)
       .onFinishChange((value) => {
         this.baseRadius = value;
@@ -118,10 +110,6 @@ export default class Render {
         this.intensity = value;
         this.preparePoints();
       });
-    folderRender.add(this.options, 'showPoints')
-        .onChange((value) => {
-          this.showPoints = value;
-        });
     folderRender.add(this.options, 'invert')
         .onChange((value) => {
           this.invert = value;
@@ -214,13 +202,7 @@ export default class Render {
   };
 
   calculateRadius = ( x, y, color) => {
-    let radius;
-    const sizing = this.sizing * 0.25;
-    if ( this.invert ) {
-      radius = Math.round( this.baseRadius * ( color / sizing ) );
-    } else {
-      radius = Math.round( this.baseRadius * (1 - ( color / sizing ) ) );
-    }
+    const radius = ( this.baseRadius * ( color / this.sizing ) );
     return radius * this.intensity;
   };
 
@@ -251,28 +233,18 @@ export default class Render {
         this.context.fillStyle = compColor;
         this.context.strokeStyle = compColor;
       }
+      
+      const baseSize = this.invert ?
+      this.spacing - currentPoint.radius : currentPoint.radius;
+      const adjust = baseSize / 2;
 
-      if(x < d){
-        this.context.beginPath();
-        this.context.moveTo(
-          (this.spacing * 0.75 + (x * this.spacing)),
-          (y * this.spacing) + currentPoint.radius * 2
-        );
-        this.context.lineTo(
-          (this.spacing * 0.75 + ((x + 1) * this.spacing)),
-          (y * this.spacing) + nextPoint.radius * 2
-        );
-        this.context.closePath();
-        this.context.stroke();
-      }
-      if(this.showPoints){
-        this.context.fillRect(
-          (this.spacing * 0.75 + (x * this.spacing)) - currentPoint.radius,
-          (y * this.spacing) + currentPoint.radius * 2,
-          currentPoint.radius * 0.5,
-          currentPoint.radius * 0.5);
-        this.context.fill();
-      }
+      this.context.fillRect(
+        (x * this.spacing) - adjust,
+        (y * this.spacing) - adjust,
+        baseSize,
+        baseSize);
+      this.context.fill();
+
     }
   };
 
