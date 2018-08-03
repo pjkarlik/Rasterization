@@ -1,5 +1,5 @@
 import dat from 'dat.gui';
-import Canvas from './Canvas';
+import Canvas from '../components/Canvas';
 
 const Can = new Canvas();
 
@@ -20,22 +20,22 @@ export default class Render {
     this.video = null;
     this.element = element;
     // Settings //
-    this.intensity = 0.5;
-    this.color = '#fc5900';
-    this.foreground = '#333d6b';
-    this.invert = true;
+    this.intensity = 0.17;
+    this.color = '#ff00d0';
+    this.foreground = '#222222';
+    this.invert = false;
     this.useUnderlyingColors = true;
     this.padding = 0;
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.sizing = 105;
-    this.spacing = Math.floor(this.canvas.width / this.sizing) + 1;
-    this.baseRadius = this.spacing * 2.25;
-    // this.baseRadius = 25;
+    this.sizing = 120;
+    this.spacing = Math.floor(this.canvas.width / this.sizing);
+    // this.baseRadius = this.spacing * 5;
+    this.baseRadius = 40;
     this.createGUI();
     this.startWebcam('video', 640, 480);
-    setTimeout(()=>this.renderLoop(),300);
+    //this.loadData(RawImage);
     window.addEventListener('resize', this.resize);
   }
 
@@ -61,6 +61,8 @@ export default class Render {
             console.log(error);
             this.video.src = window.URL.createObjectURL(stream);
           }
+          
+          setTimeout(()=>this.renderLoop(),300);
         },
         () => {
           console.log('error');
@@ -89,8 +91,8 @@ export default class Render {
       baseRadius: this.baseRadius,
       color: this.color,
       foreground: this.foreground,
-      useUnderlyingColors: this.useUnderlyingColors,
-      invert: this.invert
+      invert: this.invert,
+      useUnderlyingColors: this.useUnderlyingColors
     };
     this.gui = new dat.GUI();
     const obj = { screenShot:() => { this.snapShot(); }};
@@ -100,7 +102,6 @@ export default class Render {
       .onFinishChange((value) => {
         this.sizing = value;
         this.spacing = Math.floor(this.canvas.width / this.sizing);
-        // this.baseRadius = this.spacing * 2;
         this.preparePoints();
       });
     folderRender.add(this.options, 'baseRadius', 0, 135).step(0.1)
@@ -108,18 +109,18 @@ export default class Render {
         this.baseRadius = value;
         this.preparePoints();
       });
-    folderRender.add(this.options, 'intensity', 0.00, 2.00).step(0.01)
+    folderRender.add(this.options, 'intensity', 0.01, 2.00).step(0.01)
       .onFinishChange((value) => {
         this.intensity = value;
         this.preparePoints();
       });
-    folderRender.add(this.options, 'useUnderlyingColors')
-      .onChange((value) => {
-        this.useUnderlyingColors = value;
-      });
     folderRender.add(this.options, 'invert')
       .onChange((value) => {
         this.invert = value;
+      });
+    folderRender.add(this.options, 'useUnderlyingColors')
+      .onChange((value) => {
+        this.useUnderlyingColors = value;
       });
     folderRender.addColor(this.options, 'color')
       .onChange((value) => {
@@ -142,12 +143,24 @@ export default class Render {
     const canvasReturn = Can.setViewport(this.canvas);
     this.canvas.width = canvasReturn.width;
     this.canvas.height = canvasReturn.height;
+    console.log(canvasReturn);
     this.spacing = Math.floor(this.canvas.width / this.sizing);
+    this.baseRadius = this.spacing * 3;
+
     this.renderLoop();
   };
 
   rgbToHex = (r, g, b) => {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  };
+
+  hexToRgb = (hex) => {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
   };
 
   getPixelData = ( x, y, width, height ) => {
@@ -184,7 +197,7 @@ export default class Render {
         // We only need one color here... since they are all the same.
         const brightness = 0.34 * colors[pixelPosition] + 0.5 * colors[pixelPosition + 1]
           + 0.16 * colors[pixelPosition + 2];
-        const baseRadius = (this.calculateRadius( j, i, brightness )/ 3);
+        const baseRadius = this.calculateRadius( j, i, brightness );
         const color = `rgba(${colors[pixelPosition]},${colors[pixelPosition + 1]},${colors[pixelPosition + 2]},1)`;
         this.points.push( { x: j, y: i, radius: baseRadius, color: color } );
       }
@@ -193,25 +206,25 @@ export default class Render {
   };
 
   calculateRadius = ( x, y, color) => {
-    let radius;
-    if ( this.invert ) {
-      radius = Math.round( this.baseRadius * ( color / 255 ) );
-    } else {
-      radius = Math.round( this.baseRadius * (1 - ( color / 255 ) ) );
-    }
+    const radius = ( this.baseRadius * ( color / this.sizing ) );
     return radius * this.intensity;
   };
 
   drawPoints = () => {
     let currentPoint;
-    this.context.fillStyle = this.foreground;
+    let nextPoint;
+    this.context.lineWidth = this.lineWidth;
+    const gc = this.hexToRgb(this.foreground);
+    this.context.fillStyle = `rgba(${gc.r},${gc.g},${gc.b},1)`;
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.context.lineCap = 'square';
     const d = ~~(this.canvas.width / this.spacing);
+    const pointTotal = this.points.length;
     let n; let x; let y;
-    for ( let i = 0; i < this.points.length; i++ ) {
+    for ( let i = 0; i < pointTotal; i++ ) {
       currentPoint = this.points[i];
+      nextPoint = i < pointTotal - 1 ? this.points[i+1] : this.points[i];
       x = i % d;
       y = ~~((i - x) / d);
 
@@ -224,21 +237,18 @@ export default class Render {
         this.context.fillStyle = compColor;
         this.context.strokeStyle = compColor;
       }
-      this.context.beginPath();
-      // this.context.arc(
-      //   (this.spacing + (x * this.spacing)) - currentPoint.radius,
-      //   (this.spacing + (y * this.spacing)) - currentPoint.radius,
-      //   currentPoint.radius,
-      //   0 , 2 * Math.PI, true);
-      const offset = this.spacing * 0.5;
-      const radi = currentPoint.radius;
+      
+      const baseSize = this.invert ?
+        this.spacing - currentPoint.radius : currentPoint.radius;
+      const adjust = baseSize / 2;
+
       this.context.fillRect(
-        offset + (x * this.spacing) - radi,
-        offset + (y * this.spacing) - radi,
-        currentPoint.radius * 2,
-        currentPoint.radius * 2);
-      this.context.closePath();
+        (x * this.spacing) - adjust,
+        (y * this.spacing) - adjust,
+        baseSize,
+        baseSize);
       this.context.fill();
+
     }
   };
 
@@ -264,7 +274,6 @@ export default class Render {
     };
   };
 
-  // Image is loaded... draw to bg canvas
   drawImageToBackground = (image) => {
     this.bgContext.drawImage( image, 0, 0, this.bgCanvas.width,
       this.bgCanvas.height );

@@ -1,4 +1,4 @@
-import Render from './components/WebcamZing';
+import Render from './cartridge/RasterApp';
 import { description, version } from '../version.json';
 
 require('../resources/styles/styles.css');

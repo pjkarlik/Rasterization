@@ -1,6 +1,5 @@
-import dat from 'dat-gui';
+import dat from 'dat.gui';
 import Canvas from './Canvas';
-import simplexNoise from './simplexNoise';
 import RawImage from '../../resources/images/charles.jpg';
 //import { Generator } from './SimplexNoise';
 const Can = new Canvas();
@@ -258,7 +257,7 @@ export default class Render {
       x = i % d;
       y = ~~((i - x) / d);
       const paintStyle = this.useUnderlyingColors ? this.invert ?
-      this.invertHex(currentPoint.color) : currentPoint.color : currentPoint.brightness;
+        this.invertHex(currentPoint.color) : currentPoint.color : currentPoint.brightness;
       this.context.fillStyle = paintStyle;
       this.context.strokeStyle = paintStyle;
       this.context.beginPath();

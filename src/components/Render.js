@@ -1,4 +1,4 @@
-import dat from 'dat-gui';
+import dat from 'dat.gui';
 import Canvas from './Canvas';
 import RawImage from '../../resources/images/Paul1.jpg';
 //import { Generator } from './SimplexNoise';

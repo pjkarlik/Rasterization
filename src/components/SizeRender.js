@@ -1,4 +1,4 @@
-import dat from 'dat-gui';
+import dat from 'dat.gui';
 import Canvas from './Canvas';
 import simplexNoise from './simplexNoise';
 import RawImage from '../../resources/images/charles.jpg';

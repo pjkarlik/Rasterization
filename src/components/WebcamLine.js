@@ -1,7 +1,5 @@
-import dat from 'dat-gui';
+import dat from 'dat.gui';
 import Canvas from './Canvas';
-import simplexNoise from './simplexNoise';
-import RawImage from '../../resources/images/charles.jpg';
 
 const Can = new Canvas();
 
@@ -59,7 +57,12 @@ export default class Render {
       navigator.getUserMedia({video: true, audio: false},
         (stream) => {
           this.video = document.getElementById('video');
-          this.video.src = window.URL.createObjectURL(stream);
+          try {
+            this.video.srcObject  = stream;
+          } catch (error) {
+            console.log(error);
+            this.video.src = window.URL.createObjectURL(stream);
+          }
           setTimeout(()=>this.renderLoop(),300);
         },
         () => {
@@ -119,13 +122,13 @@ export default class Render {
         this.preparePoints();
       });
     folderRender.add(this.options, 'showPoints')
-        .onChange((value) => {
-          this.showPoints = value;
-        });
+      .onChange((value) => {
+        this.showPoints = value;
+      });
     folderRender.add(this.options, 'invert')
-        .onChange((value) => {
-          this.invert = value;
-        });
+      .onChange((value) => {
+        this.invert = value;
+      });
     folderRender.add(this.options, 'useUnderlyingColors')
       .onChange((value) => {
         this.useUnderlyingColors = value;

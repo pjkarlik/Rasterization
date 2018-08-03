@@ -1,6 +1,5 @@
-import dat from 'dat-gui';
+import dat from 'dat.gui';
 import Canvas from './Canvas';
-import simplexNoise from './simplexNoise';
 import RawImage from '../../resources/images/charles.jpg';
 //import { Generator } from './SimplexNoise';
 const Can = new Canvas();
@@ -65,7 +64,12 @@ export default class Render {
       navigator.getUserMedia({video: true, audio: false},
         (stream) => {
           this.video = document.getElementById('video');
-          this.video.src = window.URL.createObjectURL(stream);
+          try {
+            this.video.srcObject  = stream;
+          } catch (error) {
+            console.log(error);
+            this.video.src = window.URL.createObjectURL(stream);
+          }
         },
         () => {
           alert('error');
@@ -215,7 +219,7 @@ export default class Render {
       x = i % cols;
       y = ~~((i - x) / cols);
       const paintStyle = this.useUnderlyingColors ? this.invert ?
-      this.invertHex(currentPoint.color) : currentPoint.color : currentPoint.brightness;
+        this.invertHex(currentPoint.color) : currentPoint.color : currentPoint.brightness;
       this.context.fillStyle = paintStyle;
       this.context.strokeStyle = paintStyle;
       this.context.beginPath();
