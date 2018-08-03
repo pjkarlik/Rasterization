@@ -1,17 +1,19 @@
 /* eslint no-console: 0 */
+
 'use strict';
-const AutoPrefixer = require('autoprefixer');
 const fs = require('fs');
 const path = require('path');
 const pkgInfo = require('./package.json');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AutoPrefixer = require('autoprefixer');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { name, version, description } = pkgInfo;
 
-fs.writeFileSync('version.json', JSON.stringify({ name, version, description }));
 const DEV_PORT = 2020;
-const marker = 'debug';
+const { name, version, description, repository } = pkgInfo;
+const { url } = repository;
+
+fs.writeFileSync('version.json', JSON.stringify({ name, version, description, url }));
 
 const config = {
   name: 'Rasterize',
@@ -24,8 +26,8 @@ const config = {
   },
   output: {
     path: path.join(__dirname, 'dist/'),
-    filename: `[name].${marker}.js`,
-    chunkFilename: `[id].${marker}.js`,
+    filename: '[name].js',
+    chunkFilename: '[id].js',
     libraryTarget: 'umd'
   },
   entry: {
@@ -39,7 +41,7 @@ const config = {
       {
         test: /\.(js|jsx)$/,
         include: [
-          /src/
+          /src/, /resources/
         ],
         use: [
           {
@@ -131,13 +133,13 @@ const config = {
   },
   plugins: [
     new ExtractTextPlugin({
-      filename: `style/[name].${marker}.[contenthash].css`,
+      filename: 'styles/[name].[contenthash].css',
       allChunks: true
     }),
     new CopyWebpackPlugin([
       {
-        from: './resources/images/rasterizer.png',
-        to: './rasterizer.png'
+        from: './resources/images/splash.png',
+        to: './splash.png'
       }
     ]),
     new HtmlWebpackPlugin({

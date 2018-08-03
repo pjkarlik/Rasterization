@@ -1,7 +1,5 @@
-import dat from 'dat-gui';
+import dat from 'dat.gui';
 import Canvas from './Canvas';
-import simplexNoise from './simplexNoise';
-import RawImage from '../../resources/images/charles.jpg';
 
 const Can = new Canvas();
 
@@ -26,7 +24,7 @@ export default class Render {
     this.color = '#ff00d0';
     this.foreground = '#222222';
     this.invert = false;
-    this.useUnderlyingColors = false;
+    this.useUnderlyingColors = true;
     this.padding = 0;
     this.points = [];
     this.time = 0;
@@ -111,9 +109,9 @@ export default class Render {
         this.preparePoints();
       });
     folderRender.add(this.options, 'invert')
-        .onChange((value) => {
-          this.invert = value;
-        });
+      .onChange((value) => {
+        this.invert = value;
+      });
     folderRender.add(this.options, 'useUnderlyingColors')
       .onChange((value) => {
         this.useUnderlyingColors = value;
@@ -235,7 +233,7 @@ export default class Render {
       }
       
       const baseSize = this.invert ?
-      this.spacing - currentPoint.radius : currentPoint.radius;
+        this.spacing - currentPoint.radius : currentPoint.radius;
       const adjust = baseSize / 2;
 
       this.context.fillRect(

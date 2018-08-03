@@ -1,4 +1,4 @@
-import Render from './components/WebcamLine';
+import Render from './components/WebcamZing';
 import { description, version } from '../version.json';
 
 require('../resources/styles/styles.css');
