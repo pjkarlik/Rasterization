@@ -1,50 +1,59 @@
 import dat from 'dat.gui';
-import Canvas from './Canvas';
-
+import Canvas from '../components/Canvas';
+import RawImage from '../../resources/images/charles.jpg';
+//import { Generator } from './SimplexNoise';
 const Can = new Canvas();
-
 /** Parent Render Class */
 export default class Render {
   constructor(element, width, height) {
-    // Display Canvas //
+    this.element = element;
+    // Settings
+
+    this.spacing = 24;
+    this.invert = false;
+    this.useUnderlyingColors = true;
+    this.intensity = 1;
+    this.points = [];
+    this.time = 0;
+    this.bgImageHeight = 0;
+    this.bgImageWidth = 0;
+
     const canvasReturn = Can.createCanvas('canvas');
     this.canvas = canvasReturn.canvas;
     this.context = canvasReturn.context;
-
-    // Background Canvas for Video //
     const bgCanvasReturn = Can.createCanvas('bgcanvas');
     this.bgCanvas = bgCanvasReturn.canvas;
     this.bgContext = bgCanvasReturn.context;
-    this.bgImageHeight = 0;
-    this.bgImageWidth = 0;
-    this.video = null;
-    this.element = element;
-    // Settings //
-    this.intensity = 0.17;
-    this.color = '#ff00d0';
-    this.foreground = '#222222';
-    this.invert = false;
-    this.useUnderlyingColors = true;
-    this.padding = 0;
-    this.points = [];
-    this.time = 0;
-    this.frames = 0;
-    this.sizing = 120;
-    this.spacing = Math.floor(this.canvas.width / this.sizing);
-    // this.baseRadius = this.spacing * 5;
-    this.baseRadius = 40;
+
+    // const formBox = document.createElement('div');
+    // formBox.className = 'inputbox';
+    // formBox.addEventListener('change', this.uploadImage);
+    // const upload = document.createElement('input');
+    // upload.className = 'upload';
+    // upload.type = 'file';
+    // const infotext = document.createElement('span');
+    // infotext.innerHTML = '▲ upload image';
+    // formBox.appendChild(upload);
+    // formBox.appendChild(infotext);
+    // document.body.appendChild(formBox);
+
+    this.video;
+    this.startWebcam();
     this.createGUI();
-    this.startWebcam('video', 640, 480);
-    //this.loadData(RawImage);
+    setTimeout(()=>{
+      //this.snapShot();
+    }, 1000);
+    this.loadData(RawImage);
+
     window.addEventListener('resize', this.resize);
   }
 
-  startWebcam = (id, width, height) => {
+  startWebcam = () => {
     const videoBlock = document.createElement('video');
     videoBlock.className = 'video';
-    videoBlock.width = width;
-    videoBlock.height = height;
-    videoBlock.id = id;
+    videoBlock.width = 160;
+    videoBlock.height = 120;
+    videoBlock.id = 'video';
     videoBlock.setAttribute('autoplay',true);
     document.body.appendChild(videoBlock);
 
@@ -61,10 +70,9 @@ export default class Render {
             console.log(error);
             this.video.src = window.URL.createObjectURL(stream);
           }
-          setTimeout(()=>this.renderLoop(),300);
         },
         () => {
-          console.log('error');
+          alert('error');
         }
       );
     }
@@ -85,11 +93,7 @@ export default class Render {
   createGUI = () => {
     this.options = {
       spacing: this.spacing,
-      sizing: this.sizing,
       intensity: this.intensity,
-      baseRadius: this.baseRadius,
-      color: this.color,
-      foreground: this.foreground,
       invert: this.invert,
       useUnderlyingColors: this.useUnderlyingColors
     };
@@ -97,41 +101,37 @@ export default class Render {
     const obj = { screenShot:() => { this.snapShot(); }};
 
     const folderRender = this.gui.addFolder('Render Options');
-    folderRender.add(this.options, 'sizing', 10, 125).step(1)
+    folderRender.add(this.options, 'spacing', 4, 100).step(2)
       .onFinishChange((value) => {
-        this.sizing = value;
-        this.spacing = Math.floor(this.canvas.width / this.sizing);
-        this.preparePoints();
+        this.options.spacing = value;
+        this.setOptions(this.options);
       });
-    folderRender.add(this.options, 'baseRadius', 0, 135).step(0.1)
-      .onFinishChange((value) => {
-        this.baseRadius = value;
-        this.preparePoints();
-      });
-    folderRender.add(this.options, 'intensity', 0.01, 2.00).step(0.01)
-      .onFinishChange((value) => {
-        this.intensity = value;
-        this.preparePoints();
-      });
+    // folderRender.add(this.options, 'intensity', 0, 2).step(0.1)
+    //   .onFinishChange((value) => {
+    //     this.options.intensity = value;
+    //     this.setOptions(this.options);
+    //   });
     folderRender.add(this.options, 'invert')
       .onChange((value) => {
-        this.invert = value;
+        this.options.invert = value;
+        this.setOptions(this.options);
       });
     folderRender.add(this.options, 'useUnderlyingColors')
       .onChange((value) => {
-        this.useUnderlyingColors = value;
+        this.options.useUnderlyingColors = value;
+        this.setOptions(this.options);
       });
-    folderRender.addColor(this.options, 'color')
-      .onChange((value) => {
-        this.color = value;
-        this.preparePoints();
-      });
-    folderRender.addColor(this.options, 'foreground')
-      .onChange((value) => {
-        this.foreground = value;
-        this.preparePoints();
-      });
-    // folderRender.open();
+    folderRender.add(obj,'screenShot');
+    folderRender.open();
+  };
+
+  setOptions = (options) => {
+    this.spacing = ~~(options.spacing) || this.spacing;
+    this.intensity = options.intensity || this.intensity;
+    this.waveform = options.waveform;
+    this.useUnderlyingColors = options.useUnderlyingColors;
+    this.invert = options.invert;
+    this.preparePoints();
   };
 
   resize = () => {
@@ -142,8 +142,7 @@ export default class Render {
     const canvasReturn = Can.setViewport(this.canvas);
     this.canvas.width = canvasReturn.width;
     this.canvas.height = canvasReturn.height;
-    console.log(canvasReturn);
-    this.spacing = Math.floor(this.canvas.width / this.sizing);
+    this.spacing = Math.floor(this.canvas.width / 40);
     this.baseRadius = this.spacing * 3;
 
     this.renderLoop();
@@ -153,13 +152,12 @@ export default class Render {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   };
 
-  hexToRgb = (hex) => {
-    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
+  invertHex = (xrgb) => {
+    let rgb = xrgb.replace(/rgb\(|\)|rgba\(|\)|\s/gi, '').split(',');
+    for (let i = 0; i < rgb.length; i++) {
+      rgb[i] = (i === 3 ? 1 : 255) - rgb[i];
+    }
+    return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},1)`;
   };
 
   getPixelData = ( x, y, width, height ) => {
@@ -185,79 +183,64 @@ export default class Render {
   };
 
   preparePoints = () => {
-    this.points = [];
     this.cols = ~~(this.canvas.width / this.spacing);
     this.rows = ~~(this.canvas.height / this.spacing);
+    this.points = [];
     const pixelData = this.getPixelData();
     const colors = pixelData.data;
+    // for( let i = this.spacing / 2; i < this.canvas.height; i += this.spacing ) {
+    //   for ( let j = this.spacing / 2; j < this.canvas.width; j += this.spacing ) {
     for( let i = 0; i < this.rows; i++ ) {
       for ( let j = 0; j < this.cols; j++ ) {
         const pixelPosition = ( (j * this.spacing) + (i * this.spacing) * pixelData.width ) * 4;
-        // We only need one color here... since they are all the same.
-        const brightness = 0.34 * colors[pixelPosition] + 0.5 * colors[pixelPosition + 1]
-          + 0.16 * colors[pixelPosition + 2];
-        const baseRadius = this.calculateRadius( j, i, brightness );
+        const greyLevel = ~~(
+          (
+            colors[pixelPosition] +
+            colors[pixelPosition + 1] +
+            colors[pixelPosition + 2 ]
+          ) * this.intensity / 3
+        );
+        const greyColor = this.invert ? 255 - greyLevel : greyLevel;
+        const brightness = `rgb(${greyColor},${greyColor},${greyColor})`;
         const color = `rgba(${colors[pixelPosition]},${colors[pixelPosition + 1]},${colors[pixelPosition + 2]},1)`;
-        this.points.push( { x: j, y: i, radius: baseRadius, color: color } );
+        this.points.push( { x: j, y: i, brightness: brightness, color: color } );
       }
     }
-
-  };
-
-  calculateRadius = ( x, y, color) => {
-    const radius = ( this.baseRadius * ( color / this.sizing ) );
-    return radius * this.intensity;
   };
 
   drawPoints = () => {
     let currentPoint;
-    let nextPoint;
-    this.context.lineWidth = this.lineWidth;
-    const gc = this.hexToRgb(this.foreground);
-    this.context.fillStyle = `rgba(${gc.r},${gc.g},${gc.b},1)`;
+    this.context.fillStyle = '#000000';
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.context.lineCap = 'square';
-    const d = ~~(this.canvas.width / this.spacing);
-    const pointTotal = this.points.length;
+    const cols = ~~(this.canvas.width / this.spacing);
     let n; let x; let y;
-    for ( let i = 0; i < pointTotal; i++ ) {
+    for ( let i = 0; i < this.points.length; i++ ) {
       currentPoint = this.points[i];
-      nextPoint = i < pointTotal - 1 ? this.points[i+1] : this.points[i];
-      x = i % d;
-      y = ~~((i - x) / d);
-
-      const compColor = this.color;
-
-      if ( this.useUnderlyingColors ) {
-        this.context.fillStyle = currentPoint.color;
-        this.context.strokeStyle = currentPoint.color;
-      } else {
-        this.context.fillStyle = compColor;
-        this.context.strokeStyle = compColor;
-      }
-      
-      const baseSize = this.invert ?
-        this.spacing - currentPoint.radius : currentPoint.radius;
-      const adjust = baseSize / 2;
-
+      x = i % cols;
+      y = ~~((i - x) / cols);
+      const paintStyle = this.useUnderlyingColors ? this.invert ?
+        this.invertHex(currentPoint.color) : currentPoint.color : currentPoint.brightness;
+      this.context.fillStyle = paintStyle;
+      this.context.strokeStyle = paintStyle;
+      this.context.beginPath();
       this.context.fillRect(
-        (x * this.spacing) - adjust,
-        (y * this.spacing) - adjust,
-        baseSize,
-        baseSize);
+        x * this.spacing,
+        y * this.spacing,
+        this.spacing,
+        this.spacing
+      );
+      this.context.closePath();
       this.context.fill();
-
     }
   };
 
   renderLoop = () => {
-    this.frames += 1;
-    if(this.frames % 2 === 0) {
-      this.snapShot();
-    }
     this.drawPoints();
-    this.animation = window.requestAnimationFrame(this.renderLoop);
+    // this.time++;
+    // if(this.time % 60 === 0) {
+    //   this.snapShot();
+    // }
+    // this.animation = window.requestAnimationFrame(this.renderLoop);
   };
 
   loadData = ( data ) => {
@@ -266,16 +249,15 @@ export default class Render {
     this.bgImageHeight = this.bgImage.height;
     this.bgImageWidth = this.bgImage.width;
     this.bgImage.onload = () => {
-      this.bgContext.drawImage(this.bgImage, 0, 0, this.bgCanvas.width,
-        this.bgCanvas.height);
-      this.preparePoints();
-      this.renderLoop();
+      this.drawImageToBackground(this.bgImage);
     };
   };
 
+  // Image is loaded... draw to bg canvas
   drawImageToBackground = (image) => {
-    this.bgContext.drawImage( image, 0, 0, this.bgCanvas.width,
-      this.bgCanvas.height );
+    this.bgContext.drawImage( image, 0, 0, this.canvas.width,
+      this.canvas.height );
     this.preparePoints();
+    this.renderLoop();
   };
 }

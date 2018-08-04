@@ -1,9 +1,9 @@
 ![travis ci build](https://travis-ci.org/pjkarlik/Rasterization.svg?branch=master&style=flat-square)
 
 
-![splash](./splash.png)
+<img src="splash.gif" alt="drawing" width="400px"/>
 
-*current experiment to learning image rasterization with Canvas and JavaScript - this is a work in progress and taken from things learned and read online.*
+*current experiment with image rasterization with Canvas and JavaScript - this is a work in progress and taken from things learned and read online.*
 
 
 ![babel](https://img.shields.io/badge/babel--core-6.26.0-green.svg?style=flat-square)
@@ -12,7 +12,7 @@
 
 # Rasterization
 
-  Current Mapping --> ```index.js``` --> (render file) ```WebacmZing.js``` (or just about any other file in src)
+  Takes in either a static image or webcam video signal and then processes that information rended on a hidden canvas to produce an average luminosity level which is translated into data points and rendered on a visible canvas.
 
 ## Run the example
   Requires Node and Yarn to be installed for build and development.

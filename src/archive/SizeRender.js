@@ -1,5 +1,5 @@
 import dat from 'dat.gui';
-import Canvas from './Canvas';
+import Canvas from '../components/Canvas';
 import simplexNoise from './simplexNoise';
 import RawImage from '../../resources/images/charles.jpg';
 //import { Generator } from './SimplexNoise';
