@@ -138,7 +138,7 @@ const config = {
     }),
     new CopyWebpackPlugin([
       {
-        from: './resources/images/splash.png',
+        from: './splash.png',
         to: './splash.png'
       }
     ]),
