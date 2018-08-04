@@ -20,6 +20,7 @@ export default class Render {
     this.video = null;
     this.element = element;
     this.isWebcam = true;
+
     // Settings //
     this.intensity = 0.09;
     this.color = '#ff00d0';
@@ -30,22 +31,24 @@ export default class Render {
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.pixelType = 'dot';
+    this.pixelType = 'square';
     this.source = 'webcam';
-    this.sizing = 90;
+    this.sizing = 50;
     this.spacing = Math.floor(this.canvas.width / this.sizing);
     // this.baseRadius = this.spacing * 5;
     this.baseRadius = 40;
 
+    // File upload Form Stuff
     const formBox = document.createElement('div');
     formBox.className = 'hidden';
     formBox.addEventListener('change', this.uploadImage);
     const upload = document.createElement('input');
+    this.downloadLink = document.createElement('a');
     upload.className = 'upload';
     upload.type = 'file';
     upload.id = 'fileUpload';
-
     formBox.appendChild(upload);
+    formBox.appendChild(this.downloadLink );
     document.body.appendChild(formBox);
     
     this.createGUI();
@@ -100,8 +103,11 @@ export default class Render {
       useUnderlyingColors: this.useUnderlyingColors
     };
     this.gui = new dat.GUI();
-    const ssconst = { screenShot:() => { this.snapShot(); }};
-    const ulconst = { uploadImage:(e) => { document.getElementById('fileUpload').click(); }};
+    const functions = { 
+      WebCamShot:() => { this.snapShot(); },
+      ExportImage:() => { this.downloadImage(); },
+      UploadImage:(e) => { document.getElementById('fileUpload').click(); }
+    };
     const folderSource = this.gui.addFolder('Source Options');
     const folderRender = this.gui.addFolder('Pixel Options');
     const folderColor = this.gui.addFolder('Color Options');
@@ -109,8 +115,9 @@ export default class Render {
       .onFinishChange((value) => {
         this.source = value;
       });
-    folderSource.add(ulconst, 'uploadImage');
-    folderSource.add(ssconst, 'screenShot');
+    folderSource.add(functions, 'UploadImage');
+    folderSource.add(functions, 'ExportImage');
+    folderSource.add(functions, 'WebCamShot');
     folderRender.add(this.options, 'pixelType',  [ 'square', 'dot'] )
       .onFinishChange((value) => {
         this.pixelType = value;
@@ -160,7 +167,6 @@ export default class Render {
     const canvasReturn = Can.setViewport(this.canvas);
     this.canvas.width = canvasReturn.width;
     this.canvas.height = canvasReturn.height;
-    console.log(canvasReturn);
     this.spacing = Math.floor(this.canvas.width / this.sizing);
     this.baseRadius = this.spacing * 3;
 
@@ -180,7 +186,6 @@ export default class Render {
     } : null;
   };
 
-
   uploadImage = (e) => {
     const fileReader = new FileReader();
     fileReader.onload = (event) => {
@@ -190,14 +195,37 @@ export default class Render {
   };
 
   downloadImage = (e) => {
+    const imageCanvas = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    const imageData = imageCanvas.data;
+    for (let i=0; i < imageData.length; i+=4){  
+      const pixelHex = this.rgbToHex(
+        imageData[i],
+        imageData[i + 1],
+        imageData[i + 2]
+      );
+      if (pixelHex===this.foreground){
+        imageData[i + 3] = 0;
+      }
+    }
+    this.context.putImageData(imageCanvas, 0, 0);
     const canvas = document.getElementById('canvas');
     const image = canvas.toDataURL('image/png')
       .replace('image/png', 'image/octet-stream');
-      //Convert image to 'octet-stream' - download //
-    window.location.href = image;
+    // window.location.href = image;
+    const date =  new Date();
+    this.downloadLink.href = image;
+    this.downloadLink.download = `RasterExport${date.getMinutes()}${date.getSeconds()}.png`;
+    this.downloadLink.click();
   };
 
-  
+  // downloadImage = (e) => {
+  //   const canvas = document.getElementById('canvas');
+  //   const image = canvas.toDataURL('image/png')
+  //     .replace('image/png', 'image/octet-stream');
+  //     //Convert image to 'octet-stream' - download //
+  //   window.location.href = image;
+  // };
+
   snapShot = () => {
     this.drawImageToBackground(this.video);
   };

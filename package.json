@@ -1,6 +1,6 @@
 {
   "name": "Rasterize",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rasterize",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/pjkarlik/Boilerplate.git"
+    "url": "git://github.com/pjkarlik/Rasterize.git"
   },
   "author": "pjkarlik@gmail.com",
   "devDependencies": {
