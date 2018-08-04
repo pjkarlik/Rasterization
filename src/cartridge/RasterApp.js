@@ -19,8 +19,9 @@ export default class Render {
     this.bgImageWidth = 0;
     this.video = null;
     this.element = element;
+    this.isWebcam = true;
     // Settings //
-    this.intensity = 0.17;
+    this.intensity = 0.09;
     this.color = '#ff00d0';
     this.foreground = '#222222';
     this.invert = false;
@@ -29,10 +30,24 @@ export default class Render {
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.sizing = 120;
+    this.pixelType = 'dot';
+    this.source = 'webcam';
+    this.sizing = 90;
     this.spacing = Math.floor(this.canvas.width / this.sizing);
     // this.baseRadius = this.spacing * 5;
     this.baseRadius = 40;
+
+    const formBox = document.createElement('div');
+    formBox.className = 'hidden';
+    formBox.addEventListener('change', this.uploadImge);
+    const upload = document.createElement('input');
+    upload.className = 'upload';
+    upload.type = 'file';
+    upload.id = 'fileUpload';
+
+    formBox.appendChild(upload);
+    document.body.appendChild(formBox);
+    
     this.createGUI();
     this.startWebcam('video', 640, 480);
     //this.loadData(RawImage);
@@ -62,7 +77,7 @@ export default class Render {
             this.video.src = window.URL.createObjectURL(stream);
           }
           
-          setTimeout(()=>this.renderLoop(),300);
+          setTimeout(()=>this.renderLoop(),270);
         },
         () => {
           console.log('error');
@@ -85,6 +100,8 @@ export default class Render {
 
   createGUI = () => {
     this.options = {
+      pixelType: this.pixelType,
+      source: this.source,
       spacing: this.spacing,
       sizing: this.sizing,
       intensity: this.intensity,
@@ -95,9 +112,21 @@ export default class Render {
       useUnderlyingColors: this.useUnderlyingColors
     };
     this.gui = new dat.GUI();
-    const obj = { screenShot:() => { this.snapShot(); }};
-
-    const folderRender = this.gui.addFolder('Render Options');
+    const ssconst = { screenShot:() => { this.snapShot(); }};
+    const ulconst = { uploadImage:(e) => { document.getElementById('fileUpload').click(); }};
+    const folderSource = this.gui.addFolder('Source Options');
+    const folderRender = this.gui.addFolder('Pixel Options');
+    const folderColor = this.gui.addFolder('Color Options');
+    folderSource.add(this.options, 'source',  [ 'webcam', 'image'] )
+      .onFinishChange((value) => {
+        this.source = value;
+      });
+    folderSource.add(ulconst, 'uploadImage');
+    folderSource.add(ssconst, 'screenShot');
+    folderRender.add(this.options, 'pixelType',  [ 'square', 'dot'] )
+      .onFinishChange((value) => {
+        this.pixelType = value;
+      });
     folderRender.add(this.options, 'sizing', 10, 125).step(1)
       .onFinishChange((value) => {
         this.sizing = value;
@@ -118,16 +147,16 @@ export default class Render {
       .onChange((value) => {
         this.invert = value;
       });
-    folderRender.add(this.options, 'useUnderlyingColors')
+    folderColor.add(this.options, 'useUnderlyingColors')
       .onChange((value) => {
         this.useUnderlyingColors = value;
       });
-    folderRender.addColor(this.options, 'color')
+    folderColor.addColor(this.options, 'color')
       .onChange((value) => {
         this.color = value;
         this.preparePoints();
       });
-    folderRender.addColor(this.options, 'foreground')
+    folderColor.addColor(this.options, 'foreground')
       .onChange((value) => {
         this.foreground = value;
         this.preparePoints();
@@ -161,6 +190,18 @@ export default class Render {
       g: parseInt(result[2], 16),
       b: parseInt(result[3], 16)
     } : null;
+  };
+
+  uploadImage = (e) => {
+    const fileReader = new FileReader();
+    fileReader.onload = (event) => {
+      this.loadData(event.target.result);
+    };
+    fileReader.readAsDataURL(e.target.files[0]);
+  };
+  
+  snapShot = () => {
+    this.drawImageToBackground(this.video);
   };
 
   getPixelData = ( x, y, width, height ) => {
@@ -242,21 +283,49 @@ export default class Render {
         this.spacing - currentPoint.radius : currentPoint.radius;
       const adjust = baseSize / 2;
 
-      this.context.fillRect(
-        (x * this.spacing) - adjust,
-        (y * this.spacing) - adjust,
-        baseSize,
-        baseSize);
-      this.context.fill();
+      switch(this.pixelType) {
+      case 'square':
+        this.context.fillRect(
+          (x * this.spacing) - adjust,
+          (y * this.spacing) - adjust,
+          baseSize,
+          baseSize);
+        this.context.fill();
+        break;
+      case 'dot':
+        this.context.beginPath();
+        this.context.arc(
+          (x * this.spacing) - adjust,
+          (y * this.spacing) - adjust,
+          baseSize,
+          0,
+          2 * Math.PI,
+          true);
+        this.context.closePath();
+        this.context.fill();
+        break;
+      default:
+        break;
 
+      }
+      
     }
   };
 
   renderLoop = () => {
     this.frames += 1;
-    if(this.frames % 2 === 0) {
-      this.snapShot();
+    switch(this.source) {
+    case 'webcam': 
+      if(this.frames % 2 === 0) {
+        this.snapShot();
+      }
+      break;
+    case 'image': 
+      break;
+    default:
+      break;
     }
+    
     this.drawPoints();
     this.animation = window.requestAnimationFrame(this.renderLoop);
   };

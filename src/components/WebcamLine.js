@@ -63,7 +63,7 @@ export default class Render {
             console.log(error);
             this.video.src = window.URL.createObjectURL(stream);
           }
-          setTimeout(()=>this.renderLoop(),300);
+          setTimeout(()=>this.renderLoop(),270);
         },
         () => {
           console.log('error');
