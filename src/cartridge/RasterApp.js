@@ -39,7 +39,7 @@ export default class Render {
 
     const formBox = document.createElement('div');
     formBox.className = 'hidden';
-    formBox.addEventListener('change', this.uploadImge);
+    formBox.addEventListener('change', this.uploadImage);
     const upload = document.createElement('input');
     upload.className = 'upload';
     upload.type = 'file';
@@ -85,18 +85,6 @@ export default class Render {
       );
     }
   }
-
-  snapShot = () => {
-    this.drawImageToBackground(this.video);
-  };
-
-  uploadImage = (e) => {
-    const fileReader = new FileReader();
-    fileReader.onload = (event) => {
-      this.loadData(event.target.result);
-    };
-    fileReader.readAsDataURL(e.target.files[0]);
-  };
 
   createGUI = () => {
     this.options = {
@@ -192,6 +180,7 @@ export default class Render {
     } : null;
   };
 
+
   uploadImage = (e) => {
     const fileReader = new FileReader();
     fileReader.onload = (event) => {
@@ -199,6 +188,15 @@ export default class Render {
     };
     fileReader.readAsDataURL(e.target.files[0]);
   };
+
+  downloadImage = (e) => {
+    const canvas = document.getElementById('canvas');
+    const image = canvas.toDataURL('image/png')
+      .replace('image/png', 'image/octet-stream');
+      //Convert image to 'octet-stream' - download //
+    window.location.href = image;
+  };
+
   
   snapShot = () => {
     this.drawImageToBackground(this.video);
