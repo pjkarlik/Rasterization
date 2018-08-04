@@ -218,14 +218,6 @@ export default class Render {
     this.downloadLink.click();
   };
 
-  // downloadImage = (e) => {
-  //   const canvas = document.getElementById('canvas');
-  //   const image = canvas.toDataURL('image/png')
-  //     .replace('image/png', 'image/octet-stream');
-  //     //Convert image to 'octet-stream' - download //
-  //   window.location.href = image;
-  // };
-
   snapShot = () => {
     this.drawImageToBackground(this.video);
   };
@@ -323,7 +315,7 @@ export default class Render {
         this.context.arc(
           (x * this.spacing) - adjust,
           (y * this.spacing) - adjust,
-          baseSize,
+          baseSize * .45,
           0,
           2 * Math.PI,
           true);
