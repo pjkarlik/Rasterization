@@ -34,10 +34,12 @@ export default class Render {
     this.frames = 0;
     this.pixelType = 'square';
     this.source = 'image';
-    this.sizing = 100;
-    this.spacing = Math.floor(this.canvas.width / this.sizing);
+
     // this.baseRadius = this.spacing * 5;
-    this.baseRadius = 70;
+    this.baseRadius = 20;
+    this.sizing = 110;
+    this.spacing = Math.floor(this.canvas.width / this.sizing);
+
 
     // File upload Form Stuff
     const formBox = document.createElement('div');
@@ -123,7 +125,7 @@ export default class Render {
       .onFinishChange((value) => {
         this.pixelType = value;
       });
-    folderRender.add(this.options, 'sizing', 10, 125).step(1)
+    folderRender.add(this.options, 'sizing', 10, Math.floor(this.canvas.width * 0.25)).step(1)
       .onFinishChange((value) => {
         this.sizing = value;
         this.spacing = Math.floor(this.canvas.width / this.sizing);
@@ -300,13 +302,13 @@ export default class Render {
       
       const baseSize = this.invert ?
         this.spacing - currentPoint.radius : currentPoint.radius;
-      const adjust = baseSize / 2;
+      const adjust = baseSize * 0.25;
 
       switch(this.pixelType) {
       case 'square':
         this.context.fillRect(
-          (x * this.spacing) - adjust,
-          (y * this.spacing) - adjust,
+          (x * this.spacing) + adjust,
+          (y * this.spacing) + adjust,
           baseSize,
           baseSize);
         this.context.fill();
