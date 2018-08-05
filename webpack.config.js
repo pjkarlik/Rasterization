@@ -92,6 +92,19 @@ const config = {
               name: 'images/[name]__[hash:base64:5].[ext]'
             }
           }
+          // ,
+          // {
+          //   loader: 'image-webpack-loader',
+          //   options: {
+          //     bypassOnDebug: true,
+          //     optipng: {
+          //       optimizationLevel: 7
+          //     },
+          //     gifsicle: {
+          //       interlaced: false
+          //     }
+          //   }
+          // }
         ]
       },
       // {
