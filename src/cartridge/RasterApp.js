@@ -1,5 +1,6 @@
 import dat from 'dat.gui';
 import Canvas from '../components/Canvas';
+import RawImage from '../../resources/images/charles.jpg';
 
 const Can = new Canvas();
 
@@ -32,11 +33,11 @@ export default class Render {
     this.time = 0;
     this.frames = 0;
     this.pixelType = 'square';
-    this.source = 'webcam';
-    this.sizing = 50;
+    this.source = 'image';
+    this.sizing = 100;
     this.spacing = Math.floor(this.canvas.width / this.sizing);
     // this.baseRadius = this.spacing * 5;
-    this.baseRadius = 40;
+    this.baseRadius = 70;
 
     // File upload Form Stuff
     const formBox = document.createElement('div');
@@ -53,7 +54,7 @@ export default class Render {
     
     this.createGUI();
     this.startWebcam('video', 640, 480);
-    //this.loadData(RawImage);
+    this.loadData(RawImage);
     window.addEventListener('resize', this.resize);
   }
 
@@ -315,7 +316,7 @@ export default class Render {
         this.context.arc(
           (x * this.spacing) - adjust,
           (y * this.spacing) - adjust,
-          baseSize * .45,
+          Math.abs(baseSize / 2),
           0,
           2 * Math.PI,
           true);

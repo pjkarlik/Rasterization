@@ -140,6 +140,10 @@ const config = {
       {
         from: './splash.png',
         to: './splash.png'
+      },
+      {
+        from: './splash.gif',
+        to: './splash.gif'
       }
     ]),
     new HtmlWebpackPlugin({
