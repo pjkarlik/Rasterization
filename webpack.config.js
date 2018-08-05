@@ -91,32 +91,20 @@ const config = {
             options: {
               name: 'images/[name]__[hash:base64:5].[ext]'
             }
-          },
-          {
-            loader: 'image-webpack-loader',
-            options: {
-              bypassOnDebug: true,
-              optipng: {
-                optimizationLevel: 7
-              },
-              gifsicle: {
-                interlaced: false
-              }
-            }
           }
         ]
       },
-      {
-        test: /\.(woff2|woff|eot|ttf|svg)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: 'fonts/[name]_[hash:base64:5].[ext]'
-            }
-          }
-        ]
-      },
+      // {
+      //   test: /\.(woff2|woff|eot|ttf|svg)$/,
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //       options: {
+      //         name: 'fonts/[name]_[hash:base64:5].[ext]'
+      //       }
+      //     }
+      //   ]
+      // },
       {
         test: /\.js$/,
         enforce: 'pre',
