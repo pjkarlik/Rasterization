@@ -24,7 +24,7 @@ export default class Render {
 
     // Settings //
     this.intensity = 0.09;
-    this.color = '#ff00d0';
+    this.color = '#FFFFFF';
     this.foreground = '#222222';
     this.invert = false;
     this.useUnderlyingColors = true;
@@ -32,13 +32,13 @@ export default class Render {
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.pixelType = 'square';
+    this.pixelType = 'dot';
     this.source = 'image';
 
     // this.baseRadius = this.spacing * 5;
-    this.baseRadius = 20;
+    this.baseRadius = 40;
     this.sizing = 110;
-    this.spacing = Math.floor(this.canvas.width / this.sizing);
+    this.spacing = ~~(this.canvas.width / this.sizing);
 
 
     // File upload Form Stuff
@@ -125,10 +125,10 @@ export default class Render {
       .onFinishChange((value) => {
         this.pixelType = value;
       });
-    folderRender.add(this.options, 'sizing', 10, Math.floor(this.canvas.width * 0.25)).step(1)
+    folderRender.add(this.options, 'sizing', 10, ~~(this.canvas.width * 0.25)).step(1)
       .onFinishChange((value) => {
         this.sizing = value;
-        this.spacing = Math.floor(this.canvas.width / this.sizing);
+        this.spacing = ~~(this.canvas.width / this.sizing);
         this.preparePoints();
       });
     folderRender.add(this.options, 'baseRadius', 0, 135).step(0.1)
@@ -300,10 +300,11 @@ export default class Render {
         this.context.strokeStyle = compColor;
       }
       
-      const baseSize = this.invert ?
-        this.spacing - currentPoint.radius : currentPoint.radius;
+      const radius = currentPoint.radius;
+      const bs = this.invert ?
+        ~~(this.spacing - radius) : ~~(radius);
       const adjust = baseSize * 0.25;
-
+      const baseSize = bs < 0.75 ? 0 : bs;
       switch(this.pixelType) {
       case 'square':
         this.context.fillRect(
