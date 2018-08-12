@@ -327,9 +327,9 @@ export default class Render {
     
      const radius = currentPoint.radius;
      const bs = this.invert ?
-       ~~(this.spacing - radius) : ~~(radius);
-     const adjust = baseSize * 0.25;
+       this.spacing - radius : radius;
      const baseSize = bs < 0.75 ? 0 : bs;
+     const adjust = this.spacing - (baseSize /2);
      switch(this.pixelType) {
      case 'square':
        this.context.fillRect(
