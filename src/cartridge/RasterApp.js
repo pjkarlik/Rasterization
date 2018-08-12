@@ -23,8 +23,8 @@ export default class Render {
     this.isWebcam = true;
 
     // Settings //
-    this.color = '#FFFFFF';
-    this.foreground = '#222222';
+    this.color = '#fffe00';
+    this.foreground = '#000000';
     this.invert = false;
     this.useUnderlyingColors = true;
     this.padding = 0;
@@ -35,9 +35,9 @@ export default class Render {
     this.source = 'image';
 
     this.intensity = 0.12;
-    this.sizing = 100;
+    this.sizing = 180;
     this.spacing = ~~(this.canvas.width / this.sizing);
-    this.baseRadius = this.spacing * 2;
+    this.baseRadius = this.spacing * 6;
     // this.baseRadius = 15;
 
     // File upload Form Stuff
@@ -100,7 +100,7 @@ export default class Render {
      intensity: this.intensity,
      baseRadius: this.baseRadius,
      color: this.color,
-     foreground: this.foreground,
+     background: this.foreground,
      invert: this.invert,
      useUnderlyingColors: this.useUnderlyingColors
    };
@@ -155,7 +155,7 @@ export default class Render {
        this.color = value;
        this.preparePoints();
      });
-   folderColor.addColor(this.options, 'foreground')
+   folderColor.addColor(this.options, 'background')
      .onChange((value) => {
        this.foreground = value;
        this.preparePoints();
