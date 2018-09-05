@@ -1,6 +1,6 @@
 import dat from 'dat.gui';
 import Canvas from '../components/Canvas';
-import RawImage from '../../resources/images/mask1.jpg';
+import RawImage from '../../resources/images/charles.jpg';
 
 const Can = new Canvas();
 
@@ -36,9 +36,9 @@ export default class Render {
 
     // this.baseRadius = this.spacing * 5;
     this.baseRadius = 5;
-    this.intensity = 0.2;
+    this.intensity = 0.27;
     this.multiplier = 50;
-    this.sizing = 150;
+    this.sizing = 190;
     this.spacing = ~~(this.canvas.width / this.sizing);
    
 
