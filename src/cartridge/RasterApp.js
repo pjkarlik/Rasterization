@@ -35,10 +35,10 @@ export default class Render {
     this.source = 'image';
 
     // this.baseRadius = this.spacing * 5;
-    this.baseRadius = 5;
+    this.baseRadius = 6.2;
     this.intensity = 0.27;
-    this.multiplier = 50;
-    this.sizing = 190;
+    this.multiplier = 58.9;
+    this.sizing = 149;
     this.spacing = ~~(this.canvas.width / this.sizing);
    
 
