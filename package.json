@@ -1,6 +1,6 @@
 {
   "name": "Rasterize",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Rasterize",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "console-polyfill": "^0.3.0",
     "copy-webpack-plugin": "^4.5.2",
     "css-loader": "~0.28.7",
-    "dat.gui": "^0.7.2",
+    "dat.gui": "^0.7.3",
     "ejs": "^2.6.1",
     "eslint": "^4.19.1",
     "eslint-import-resolver-webpack": "^0.10.0",

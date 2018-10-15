@@ -374,15 +374,20 @@ export default class Render {
       if(this.frames % 2 === 0) {
         this.snapShot();
       }
+      this.drawPoints();
+      this.animation = window.requestAnimationFrame(this.renderLoop);
       break;
     case 'image': 
+      this.drawPoints();
+      setTimeout(() => {
+        window.requestAnimationFrame(this.renderLoop);
+      }, 500);
       break;
     default:
       break;
     }
     
-    this.drawPoints();
-    this.animation = window.requestAnimationFrame(this.renderLoop);
+    
   };
 
   loadData = ( data ) => {
@@ -399,8 +404,8 @@ export default class Render {
   };
 
   drawImageToBackground = (image) => {
-    this.bgContext.drawImage( image, 0, 0, this.bgCanvas.width,
-      this.bgCanvas.height );
+    this.bgContext.drawImage(image, 0, 0, this.bgCanvas.width,
+      this.bgCanvas.height);
     this.preparePoints();
   };
 }
