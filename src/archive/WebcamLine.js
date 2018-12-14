@@ -20,18 +20,18 @@ export default class Render {
     this.video = null;
     this.element = element;
     // Settings //
-    this.intensity = 0.17;
+    this.intensity = 0.77;
     this.color = '#ff00d0';
     this.foreground = '#222222';
     this.invert = true;
-    this.showPoints = true;
-    this.useUnderlyingColors = true;
+    this.showPoints = false;
+    this.useUnderlyingColors = false;
     this.padding = 0;
     this.points = [];
     this.time = 0;
     this.frames = 0;
-    this.sizing = 80;
-    this.lineWidth = 1.0;
+    this.sizing = 180;
+    this.lineWidth = 0.5;
     this.spacing = Math.floor(this.canvas.width / this.sizing);
     // this.baseRadius = this.spacing * 5;
     this.baseRadius = 15;

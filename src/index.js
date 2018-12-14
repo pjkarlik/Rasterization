@@ -1,4 +1,5 @@
 import Render from './cartridge/RasterApp';
+// import Render from './archive/WebcamLine';
 import { description, version } from '../version.json';
 
 require('../resources/styles/styles.css');
