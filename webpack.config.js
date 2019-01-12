@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const pkgInfo = require('./package.json');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AutoPrefixer = require('autoprefixer');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -24,6 +24,7 @@ const config = {
     port: DEV_PORT,
     historyApiFallback: true
   },
+  mode: 'development',
   output: {
     path: path.join(__dirname, 'dist/'),
     filename: '[name].js',
@@ -61,28 +62,24 @@ const config = {
       },
       {
         test: /\.less$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                modules: true,
-                importLoaders: 1,
-                localIdentName: '[name]__[local]___[hash:base64:5]'
-              }
-            },
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: () => [AutoPrefixer]
-              }
-            },
-            'less-loader'
-          ],
-          publicPath: '../'
-        })
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              modules: true,
+              localIdentName: '[name]__[local]___[hash:base64:5]'
+            }
+          },
+          {
+            loader: 'less-loader'
+          }
+        ]
       },
+      // Image loading //
       {
         test: /\.(png|gif|cur|jpg)$/,
         use: [
@@ -91,33 +88,21 @@ const config = {
             options: {
               name: 'images/[name]__[hash:base64:5].[ext]'
             }
+          },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true,
+              optipng: {
+                optimizationLevel: 7
+              },
+              gifsicle: {
+                interlaced: false
+              }
+            }
           }
-          // ,
-          // {
-          //   loader: 'image-webpack-loader',
-          //   options: {
-          //     bypassOnDebug: true,
-          //     optipng: {
-          //       optimizationLevel: 7
-          //     },
-          //     gifsicle: {
-          //       interlaced: false
-          //     }
-          //   }
-          // }
         ]
       },
-      // {
-      //   test: /\.(woff2|woff|eot|ttf|svg)$/,
-      //   use: [
-      //     {
-      //       loader: 'file-loader',
-      //       options: {
-      //         name: 'fonts/[name]_[hash:base64:5].[ext]'
-      //       }
-      //     }
-      //   ]
-      // },
       {
         test: /\.js$/,
         enforce: 'pre',
@@ -133,8 +118,8 @@ const config = {
     ]
   },
   plugins: [
-    new ExtractTextPlugin({
-      filename: 'styles/[name].[contenthash].css',
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
       allChunks: true
     }),
     new CopyWebpackPlugin([
