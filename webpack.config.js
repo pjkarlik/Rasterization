@@ -24,6 +24,7 @@ const config = {
     port: DEV_PORT,
     historyApiFallback: true
   },
+  mode: 'development',
   output: {
     path: path.join(__dirname, 'dist/'),
     filename: '[name].js',
