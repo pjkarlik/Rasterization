@@ -5,9 +5,8 @@
 
 *current experiment with image rasterization and JavaScript - this is a work in progress and taken from things learned and read online.*
 
-![version](https://img.shields.io/badge/version-0.1.2-green.svg?style=flat-square)
-![babel](https://img.shields.io/badge/babel--core-6.26.0-green.svg?style=flat-square)
-![webpack](https://img.shields.io/badge/webpack-3.6.0-51b1c5.svg?style=flat-square)
+![version](https://img.shields.io/badge/version-0.2.0-green.svg?style=flat-square)
+![webpack](https://img.shields.io/badge/webpack-4.12.1-51b1c5.svg?style=flat-square)
 ![stage-0](https://img.shields.io/badge/ECMAScript-6-c55197.svg?style=flat-square)
 
 # Rasterization
