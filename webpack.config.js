@@ -6,7 +6,6 @@ const path = require('path');
 const pkgInfo = require('./package.json');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const AutoPrefixer = require('autoprefixer');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const DEV_PORT = 2020;
